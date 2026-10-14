@@ -1,0 +1,76 @@
+---
+# EXAMPLE POST (draft). It shows every lab-notes feature. Replace it with your real writeup, then set draft: false.
+title: "My first CTF: what I solved, what beat me, and what I’m studying next"
+summary: "I'm a beginner. I spent a weekend on a practice “capture the flag” event, where every target is built to be broken on purpose. Here's my honest run: three I got, two that humbled me, and the concepts I'm learning because of them."
+num: 41
+date: 2026-10-14
+layer: security
+topics: [CTF, CRYPTO]
+draft: true
+source: "[practice CTF name]"
+scope: "Practice targets built to be attacked, in an isolated lab I set up myself."
+level: "total beginner"
+file: labnotes_041.md
+# npm run flag -- "flag{pk_m4g1c}"
+flagHash: 26adaf5309ce930b2bcf7b36a536b9c517733737ed212da01e6e1456f4779273
+flagLabel: "My first CTF"
+flagHint: "A ZIP stores the name of the file it holds. Bytes 26 and 27 say how long that name is. Start reading at byte 30."
+flagLesson: "files describe themselves. The extension is a label anyone can change; the bytes are the truth. That's why upload checks should read the bytes too."
+---
+import HexViewer from '../../../components/kit/HexViewer';
+
+## Looking around
+
+A CTF challenge usually hands you something small: a login page, a file, a snippet of code. The first job is just to read carefully. One challenge gave a login form and this hint in the page source:
+
+```html title="view-source"
+<!-- TODO: move the test login out before launch -->
+<!-- creds in /static/notes.txt -->
+```
+
+That comment is the whole lesson: things you leave in "for now" are the first thing a stranger reads. I've written comments exactly like this at work. I won't again.
+
+## Reading a file as bytes
+
+One challenge gave a file with no extension. Opening it as raw bytes (a "hex dump") shows what it really is. The first four bytes, the "magic number", name the format. A little further in, a ZIP also writes down the name of the file packed inside it. Hover or tap any byte:
+
+<Toy title="HEX VIEWER">
+  <HexViewer
+    client:visible
+    bytes="50 4B 03 04 14 00 00 00 08 00 21 55 6E 2A 9C B1 E7 3A 2F 01 00 00 88 02 00 00 12 00 00 00 66 6C 61 67 7B 70 6B 5F 6D 34 67 31 63 7D 2E 74 78 74"
+    highlight={[0, 3]}
+    fields={[
+      { from: 0, to: 3, label: 'signature: "PK" + 03 04 means this is a ZIP' },
+      { from: 4, to: 5, label: 'version needed to extract (2.0)' },
+      { from: 6, to: 7, label: 'general-purpose flags' },
+      { from: 8, to: 9, label: 'compression method: 8 = deflate' },
+      { from: 10, to: 11, label: 'last-modified time' },
+      { from: 12, to: 13, label: 'last-modified date' },
+      { from: 14, to: 17, label: 'CRC-32 checksum of the contents' },
+      { from: 18, to: 21, label: 'compressed size: 303 bytes (little-endian)' },
+      { from: 22, to: 25, label: 'uncompressed size: 648 bytes' },
+      { from: 26, to: 27, label: 'file name length: 0x12 = 18 bytes' },
+      { from: 28, to: 29, label: 'extra field length: 0' },
+      { from: 30, to: 47, label: 'file name, character {n} of {len}' },
+    ]}
+  />
+  <Fragment slot="caption"><strong>Figure 1.</strong> The first bytes <code>50 4B 03 04</code> spell <code>PK</code>: it was a ZIP all along. The rest of the header is sizes, a checksum, and a name.</Fragment>
+</Toy>
+
+## The one that beat me
+
+A crypto challenge used a cipher I didn't recognise. I couldn't solve it in time. After the event I read other people's writeups and learned what I'd missed. The takeaway is hidden below, so you can guess first:
+
+<Spoiler label="SPOILER · click to reveal what I learned">
+It was a classic substitution cipher with a repeating key (a Vigenère). The lesson: repeating keys leave repeating patterns, which is why real systems use vetted, modern crypto libraries instead of inventing their own.
+</Spoiler>
+
+<Hat role="DEV HAT">
+Every one of these taught me a defence I now use in real code: check what a file actually is, not what its name claims; never ship debug comments; and never roll my own crypto.
+</Hat>
+
+## What I'm studying next
+
+1. The basics of how classic ciphers work, so the next crypto challenge isn't a wall.
+2. How web apps actually check who you are (sessions and tokens), from the defender's side.
+3. Keep a tidy lab notebook, so every solve becomes a post like this one.

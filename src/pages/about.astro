@@ -1,0 +1,191 @@
+---
+import Base from '../layouts/Base.astro';
+import Window from '../components/Window.astro';
+import { SITE, ABOUT } from '../config/site';
+import { LAYERS, LAYER_KEYS } from '../config/taxonomy';
+import { getFlags, url } from '../lib/content';
+const flags = await getFlags();
+const BADGE = { shipped: 'b-shipped', learning: 'b-learning', queued: 'b-queued' } as const;
+const links = [
+  { label: 'EMAIL', href: `mailto:${SITE.email}`, square: true },
+  ...SITE.socials.map((s) => ({ label: s.label, href: s.href, square: false })),
+  ...(SITE.cv ? [{ label: 'CV.PDF', href: url(SITE.cv), square: false }] : []),
+  { label: 'RSS FEEDS', href: url('writing/#feeds-h'), square: false },
+];
+const art = [
+  ['#ff5a4e', '    ▄██▄     ██████▄ '],
+  ['#ff9f1c', '   ██  ██    ██   ██ '],
+  ['#ffd23f', '  ██    ██   ██████  '],
+  ['#b8ff3b', '  ████████   ██   ██ '],
+  ['#4aa8ff', '  ██    ██   ██   ██ '],
+  ['#ff6fd8', '  ██    ██   ██████▀ '],
+];
+---
+<Base title="About" description={`Who ${SITE.firstName} is, what he's learning, and how to reach him.`} active="about">
+  <div class="wrap" style="padding-top:28px;padding-bottom:72px">
+    <div class="row" style="justify-content:space-between;align-items:flex-end;gap:16px 24px;margin-bottom:20px">
+      <h1 class="display display-l">$ whoami</h1>
+      <div class="row" role="group" aria-label="View" id="view-btns">
+        <button type="button" class="key key--ghost key--sm" data-view="fetch" aria-pressed="true">NEOFETCH</button>
+        <button type="button" class="key key--ghost key--sm" data-view="plain" aria-pressed="false">RECRUITER MODE</button>
+      </div>
+    </div>
+
+    <div data-panel="fetch">
+      <Window title={`${SITE.handle}@board — neofetch`} pid="PID 001" dots={['#ffd23f', '#ff6fd8', '#b8ff3b']}>
+        <div style="padding:clamp(18px,3vw,32px);display:flex;flex-wrap:wrap;gap:28px 48px;font-family:var(--f-mono);font-size:clamp(14px,1.3vw,16px);line-height:1.6">
+          <pre aria-hidden="true" style="margin:0;flex:none;font-family:var(--f-mono);font-size:clamp(14px,1.5vw,18px);line-height:1.15;font-weight:700">{art.map(([c, t]) => <><span style={`color:${c}`}>{t}</span>{'\n'}</>)}{'\n'}<span style="color:var(--muted-2)">  learning in public</span></pre>
+          <dl style="margin:0;flex:1 1 340px;min-width:0;display:grid;grid-template-columns:auto minmax(0,1fr);gap:2px 14px">
+            <dt style="grid-column:1/-1;color:var(--lime);font-weight:700">{SITE.handle}<span style="color:#fff">@</span>board</dt>
+            <dd aria-hidden="true" style="grid-column:1/-1;margin:0 0 4px;color:var(--muted-2)">-------------</dd>
+            {ABOUT.neofetch.map(([k, v]) => <><dt style="color:var(--yellow);font-weight:700">{k}</dt><dd style="margin:0;color:var(--text)">{v}</dd></>)}
+            <dt style="color:var(--yellow);font-weight:700">Flags</dt>
+            <dd style="margin:0;color:var(--text);display:flex;flex-wrap:wrap;align-items:center;gap:8px"><span><span id="found-n">0</span>/{flags.length} found in this browser</span>
+              <span aria-hidden="true" style="display:inline-flex;gap:4px">{flags.map((f) => <span data-flag={f.id}><span class="led" style="width:9px;height:9px"></span></span>)}</span></dd>
+            <dd aria-hidden="true" style="grid-column:1/-1;margin:10px 0 0;display:flex">{['#ff5a4e', '#ff9f1c', '#ffd23f', '#b8ff3b', '#3ddc84', '#4aa8ff', '#ff6fd8', '#ffffff'].map((c) => <span style={`width:28px;height:18px;background:${c}`}></span>)}</dd>
+          </dl>
+        </div>
+      </Window>
+    </div>
+
+    <div data-panel="plain" hidden>
+      <div style="background:var(--paper);color:var(--ink);border:2px solid var(--night);border-radius:12px;padding:clamp(20px,3vw,36px);box-shadow:var(--shadow)">
+        <div class="row" style="justify-content:space-between;gap:12px 24px;align-items:baseline">
+          <div>
+            <div style="font-family:var(--f-display);font-weight:800;font-size:36px;line-height:1.05">{SITE.name}</div>
+            <div style="margin-top:4px;font-size:18px">{ABOUT.recruiter.title}</div>
+          </div>
+          {SITE.cv && <a class="key key--yellow" href={url(SITE.cv)}>DOWNLOAD CV (PDF)</a>}
+        </div>
+        <ul style="margin:20px 0 0;padding-left:20px;max-width:72ch;font-size:18px;line-height:1.6;display:flex;flex-direction:column;gap:6px">
+          {ABOUT.recruiter.bullets.map((b) => <li>{b}</li>)}
+        </ul>
+      </div>
+    </div>
+
+    <section aria-labelledby="ct" style="margin-top:40px">
+      <h2 id="ct" class="label" style="margin:0 0 12px;font-weight:400;font-size:13px;color:rgba(255,255,255,.85)">J5 · CONNECT HERE</h2>
+      <div style="background:#141016;border-radius:10px;padding:12px 18px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:4px 18px">
+        {links.map((l) => <a class="pin" href={l.href}><span class="pin__pad" aria-hidden="true" style={l.square ? 'border-radius:4px' : undefined}></span>{l.label}</a>)}
+      </div>
+    </section>
+
+    <section aria-labelledby="fg" style="margin-top:40px">
+      <div class="row" style="justify-content:space-between;align-items:flex-end;gap:12px 24px;margin-bottom:12px">
+        <div>
+          <h2 id="fg" class="label" style="margin:0;font-weight:400;font-size:13px;color:var(--lime)">J6 · FLAGS FOUND ON THIS DEVICE</h2>
+          <p style="margin:6px 0 0;font-size:16px;color:var(--text)">Some posts hide a flag. Each one lit here is one you found. Saved in this browser only.</p>
+        </div>
+        <button type="button" class="key key--lime-ghost key--sm" id="open-drawer">OPEN FLAG DRAWER</button>
+      </div>
+      <div style="background:#141016;border-radius:10px;padding:18px 18px 12px;display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px 18px">
+        {flags.map((f) => (
+          <a href={f.href} class="flag-led" data-flag={f.id}>
+            <span class="flag-led__dome" aria-hidden="true"></span>
+            <span class="led-btn__legs" aria-hidden="true"><i></i><i></i></span>
+            <span class="mono" style="font-size:13px;color:var(--orange)">{f.num}</span>
+            <span style="font-size:14px;line-height:1.3">{f.title}</span>
+            <span class="status when-hidden">HIDDEN</span><span class="status is-on when-found">FOUND</span>
+          </a>
+        ))}
+      </div>
+    </section>
+
+    <section aria-labelledby="rm" style="margin-top:72px">
+      <h2 id="rm" class="h2" style="margin-bottom:8px">The learning roadmap</h2>
+      <p style="margin:0 0 24px;font-size:18px;color:var(--text)">Not a skills grid pretending I've mastered everything. An honest map of where I am on each track: <strong style="color:var(--green)">shipped</strong>, <strong style="color:var(--yellow)">learning now</strong>, or <strong class="muted">queued up</strong>. Pick a track.</p>
+      <div class="row" role="group" aria-label="Track" id="tracks" style="margin-bottom:18px">
+        {LAYER_KEYS.map((k, i) => <button type="button" class="pill" data-track={k} aria-pressed={String(k === 'security')} style={`--c:${LAYERS[k].color};min-height:44px`}>{LAYERS[k].name}</button>)}
+      </div>
+      {LAYER_KEYS.map((k) => (
+        <div class="window" data-track-panel={k} hidden={k !== 'security'} style="box-shadow:none;padding:20px clamp(16px,3vw,28px)">
+          <ol class="roadmap" style={`--rail:${LAYERS[k].color}`}>
+            {ABOUT.roadmap[k].map((s) => (
+              <li class={s.state}>
+                <div class="row" style="gap:6px 12px;align-items:baseline">
+                  <span style="font-family:var(--f-display);font-weight:700;font-size:21px">{s.name}</span>
+                  <span class={`badge ${BADGE[s.state]}`}>{s.state}</span>
+                </div>
+                <p style="margin:4px 0 0;max-width:62ch;font-size:16px;line-height:1.5;color:var(--text)">{s.note}</p>
+              </li>
+            ))}
+          </ol>
+        </div>
+      ))}
+    </section>
+
+    <section aria-labelledby="exp" style="margin-top:72px">
+      <h2 id="exp" class="h2" style="margin-bottom:8px">Day job &amp; night bench</h2>
+      <p style="margin:0 0 28px;font-size:18px;color:var(--text)">Two wires on the same board. One pays the bills and teaches me to ship; the other is where I learn for the joy of it.</p>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(300px,100%),1fr));gap:20px">
+        <div class="window" style="box-shadow:none;padding:20px clamp(16px,3vw,28px)">
+          <div class="mono" style="font-size:14px;color:#7cc0ff">branch: day-job</div>
+          <div style="margin-top:6px;font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1.1">{ABOUT.dayJob.title}</div>
+          <div class="mono" style="margin-top:2px;font-size:13px;color:#a99fbb">{ABOUT.dayJob.when}</div>
+          <ul class="job-list">{ABOUT.dayJob.bullets.map((b) => <li>{b}</li>)}</ul>
+        </div>
+        <div class="window" style="box-shadow:none;padding:20px clamp(16px,3vw,28px)">
+          <div class="row" style="gap:8px"><span class="hazard hazard-sq" aria-hidden="true" style="width:16px;height:16px"></span><span class="mono" style="font-size:14px;color:var(--lime)">branch: night-bench</span></div>
+          <div style="margin-top:6px;font-family:var(--f-display);font-weight:800;font-size:26px;line-height:1.1">Learning, for fun</div>
+          <div class="mono" style="margin-top:2px;font-size:13px;color:#a99fbb">evenings &amp; weekends</div>
+          <ul class="job-list">{ABOUT.nightBench.map((b) => <li>{b}</li>)}</ul>
+        </div>
+      </div>
+      <div class="row" style="margin-top:20px;justify-content:space-between;align-items:baseline;gap:8px 24px;padding:18px clamp(16px,3vw,28px);border:2px dashed rgba(255,255,255,.4);border-radius:14px">
+        <div>
+          <div class="mono" style="font-size:14px;color:var(--orange)">{ABOUT.education.when}</div>
+          <div style="margin-top:4px;font-family:var(--f-display);font-weight:700;font-size:24px">{ABOUT.education.title}</div>
+        </div>
+        <span style="font-size:16px;color:var(--text)">{ABOUT.education.note}</span>
+      </div>
+    </section>
+  </div>
+</Base>
+
+<style>
+  .pin { display: flex; align-items: center; gap: 12px; min-height: 48px; text-decoration: none; font-family: var(--f-label); font-size: 13px; transition: color 150ms; }
+  .pin__pad { width: 20px; height: 20px; border-radius: 50%; background: var(--gold); transition: transform 150ms, background 150ms; }
+  .pin:hover .pin__pad { background: var(--yellow); transform: scale(1.15); }
+  .flag-led { display: flex; flex-direction: column; align-items: center; gap: 6px; padding-bottom: 6px; text-decoration: none; color: #fff; text-align: center; }
+  .flag-led__dome { width: 34px; height: 42px; border-radius: 17px 17px 4px 4px; border: 2px solid rgba(255, 255, 255, 0.3); background: var(--lime); opacity: 0.22; box-shadow: inset -6px -8px 0 rgba(0, 0, 0, 0.2); }
+  .flag-led[data-found='true'] .flag-led__dome { opacity: 1; box-shadow: 0 0 22px 6px rgba(184, 255, 59, 0.5), inset -6px -8px 0 rgba(0, 0, 0, 0.12); }
+  .flag-led .when-found { display: none; }
+  .flag-led[data-found='true'] .when-found { display: inline; }
+  .flag-led[data-found='true'] .when-hidden { display: none; }
+  .roadmap { list-style: none; margin: 0; padding: 0 0 0 30px; position: relative; display: flex; flex-direction: column; gap: 18px; }
+  .roadmap::before { content: ''; position: absolute; left: 7px; top: 8px; bottom: 8px; width: 4px; border-radius: 2px; background: var(--rail); }
+  .roadmap li { position: relative; }
+  .roadmap li::before { content: ''; position: absolute; left: -30px; top: 5px; width: 16px; height: 16px; border-radius: 50%; border: 3px solid var(--panel); background: #5a3a8a; }
+  .roadmap li.shipped::before { background: var(--green); }
+  .roadmap li.learning::before { background: var(--yellow); }
+  .badge { font-family: var(--f-label); font-size: 10px; padding: 3px 8px; border-radius: 10px; }
+  .b-shipped { background: #0f2a1a; color: var(--green); border: 1px solid var(--green); }
+  .b-learning { background: #3a2f0a; color: var(--yellow); border: 1px solid var(--yellow); }
+  .b-queued { background: var(--panel-2); color: var(--muted); border: 1px solid #5a3a8a; }
+  .job-list { margin: 14px 0 0; padding-left: 18px; font-size: 17px; line-height: 1.55; color: var(--text); display: flex; flex-direction: column; gap: 8px; }
+  #view-btns [aria-pressed='true'] { background: var(--yellow); color: var(--ink); border-color: var(--ink); }
+</style>
+
+<script>
+  import { getFound, onFlags } from '../lib/flags';
+  const total = document.querySelectorAll('.flag-led').length;
+  const n = document.getElementById('found-n');
+  const ids = Array.from(document.querySelectorAll<HTMLElement>('.flag-led')).map((e) => e.dataset.flag!);
+  const paint = (f: string[]) => { if (n) n.textContent = String(ids.filter((i) => f.includes(i)).length); };
+  paint(getFound()); onFlags(paint); void total;
+  document.getElementById('open-drawer')?.addEventListener('click', (e) => { e.stopPropagation(); window.dispatchEvent(new Event('drawer:open')); });
+  const vb = document.getElementById('view-btns');
+  vb?.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-view]');
+    if (!b) return;
+    vb.querySelectorAll('[data-view]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    document.querySelectorAll<HTMLElement>('[data-panel]').forEach((p) => (p.hidden = p.dataset.panel !== b.dataset.view));
+  });
+  const tr = document.getElementById('tracks');
+  tr?.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-track]');
+    if (!b) return;
+    tr.querySelectorAll('[data-track]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    document.querySelectorAll<HTMLElement>('[data-track-panel]').forEach((p) => (p.hidden = p.dataset.trackPanel !== b.dataset.track));
+  });
+</script>

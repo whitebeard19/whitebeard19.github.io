@@ -1,0 +1,38 @@
+---
+import Base from '../layouts/Base.astro';
+import { SITE } from '../config/site';
+import { url } from '../lib/content';
+const trace = [
+  ['home', url(''), '(/)'],
+  ['writing', url('writing/'), '(/writing — every post)'],
+  ['lab-notes', url('lab-notes/'), '(/lab-notes — security)'],
+  ['builds', url('builds/'), '(/builds)'],
+  ['whoami', url('about/'), '(/about)'],
+  ['report a broken link', `mailto:${SITE.email}`, '(email)'],
+];
+---
+<Base title="404 — kernel panic" footer="404">
+  <div class="wrap" style="padding-top:28px;padding-bottom:56px">
+    <div class="window" style="background:var(--night);border-color:#000">
+      <div class="window__bar" style="background:var(--panel)">
+        <span class="dots" aria-hidden="true"><span style="background:var(--red)"></span><span style="background:var(--red)"></span><span style="background:var(--red)"></span></span>
+        <span>tty0 — kernel panic</span><span class="pid">PID 404</span>
+      </div>
+      <div class="trace" style="padding:clamp(20px,4vw,48px);font-family:var(--f-mono);color:var(--text)">
+        <div style="font-size:14px;color:#ff8a8a">[ 404.000000 ] {SITE.os.toLowerCase()}: kernel panic — not syncing: page not found</div>
+        <h1 class="display" style="margin-top:18px;font-size:clamp(72px,13vw,180px);line-height:.85;color:#fff">0x404<span class="caret" aria-hidden="true"></span></h1>
+        <p style="margin:18px 0 0;max-width:52ch;font-family:var(--f-display);font-size:clamp(20px,2.2vw,26px);line-height:1.35;color:#fff">The page you asked for isn't on this board. Maybe it was never soldered in, maybe I moved it.</p>
+        <div style="margin-top:32px;font-size:15px;line-height:1.9">
+          <div class="muted">Call trace (each frame is a way out):</div>
+          {trace.map(([t, h, n]) => <div>&nbsp;&nbsp;at <a href={h}>{t}</a> <span class="muted">{n}</span></div>)}
+        </div>
+        <a href={url('')} class="key" style="margin-top:36px;border-color:var(--green);background:#0f2a1a;color:var(--green)">REBOOT TO HOME ↵</a>
+        <div class="muted" style="margin-top:40px;font-size:13px">---[ end kernel panic — not syncing: page not found ]---</div>
+      </div>
+    </div>
+  </div>
+</Base>
+<style>
+  .trace a { color: var(--yellow); }
+  .trace a:hover { background: var(--yellow); color: var(--night); }
+</style>

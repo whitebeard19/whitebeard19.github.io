@@ -1,0 +1,14 @@
+---
+interface Props { title: string; pid?: string; class?: string; dots?: string[] }
+const { title, pid, class: cls = '', dots } = Astro.props;
+---
+<div class={`window ${cls}`}>
+  <div class="window__bar">
+    <span class="dots" aria-hidden="true">
+      {dots ? dots.map((c) => <span style={`background:${c}`}></span>) : <><span></span><span></span><span></span></>}
+    </span>
+    <span>{title}</span>
+    <span class="pid">{pid}</span>
+  </div>
+  <slot />
+</div>

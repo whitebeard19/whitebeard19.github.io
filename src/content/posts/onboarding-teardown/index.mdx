@@ -1,0 +1,55 @@
+---
+# EXAMPLE POST (draft). Shows the product "teardown" style. Replace with your own, then set draft: false.
+title: "Why our onboarding lost half its users at step two"
+summary: "How we found the leak, the three fixes we argued about, and the one we shipped. I was the engineer on it and ended up owning the product call too."
+num: 32
+date: 2026-09-22
+layer: product
+topics: [PROD]
+draft: true
+case:
+  role: "engineer + product owner"
+  team: "[2 eng, 1 designer]"
+  timeline: "[3 weeks]"
+  stack: "[YOUR STACK]"
+---
+import FunnelProbe from './Toy';
+
+## The problem
+
+Signups were healthy. Activation wasn't. Roughly half of new users never created their first project, and the ones who left all left at the same place: step two, "connect your data".
+
+## The signal
+
+Treat the funnel like a circuit with a leak: probe every node and the voltage drop tells you where.
+
+<Toy title="FUNNEL PROBE">
+  <FunnelProbe client:visible />
+  <Fragment slot="caption">Share of new signups reaching each step, before the fix. Click a step to probe it. Example data.</Fragment>
+</Toy>
+
+Session recordings and five user calls told the same story: people didn't have their credentials at hand, so they left "to get them" and never came back.
+
+## The decision
+
+Three options made it to the whiteboard. Because I'd be the one building it, I could put honest effort estimates next to the product bets.
+
+| Branch | Bet | Effort | Status |
+| --- | --- | --- | --- |
+| `fix/help-text` | Users are confused | 1 day | closed |
+| `feat/sample-data` | Show value before setup | 1.5 wk | **merged** |
+| `feat/oauth` | Remove the credentials step | 4 wk | backlog |
+
+<Hat role="SDE HAT">
+Sample data meant a demo workspace per user. I kept it cheap with copy-on-write: one shared dataset, cloned only when the user edits it.
+</Hat>
+
+## What shipped
+
+New users now land in a working project filled with sample data. Connecting their own data moved to a banner they can act on whenever they're ready. Activation went from [48%] to [71%] in the [four] weeks after launch.
+
+## What I'd change
+
+1. Instrument the funnel *before* the redesign. We lost a week rebuilding baseline numbers.
+2. Talk to the users who churned, not only the ones who stayed.
+3. Give OAuth a date on the roadmap, so "later" doesn't quietly become "never".

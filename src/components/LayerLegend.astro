@@ -1,0 +1,13 @@
+---
+import { LAYERS, LAYER_KEYS } from '../config/taxonomy';
+---
+<div class="row label" style="gap:14px">
+  {LAYER_KEYS.map((k) => (
+    <span class="row" style="gap:6px">
+      {k === 'security'
+        ? <span class="hazard" aria-hidden="true" style="width:14px;height:8px"></span>
+        : <span aria-hidden="true" style={`width:14px;height:4px;background:${LAYERS[k].color}`}></span>}
+      {LAYERS[k].name}
+    </span>
+  ))}
+</div>

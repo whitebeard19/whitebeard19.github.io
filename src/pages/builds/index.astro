@@ -1,0 +1,43 @@
+---
+import Base from '../../layouts/Base.astro';
+import BuildCard from '../../components/BuildCard.astro';
+import Subscribe from '../../components/Subscribe.astro';
+import Empty from '../../components/Empty.astro';
+import { LAYERS, LAYER_KEYS } from '../../config/taxonomy';
+import { getBuilds } from '../../lib/content';
+const builds = await getBuilds();
+const used = LAYER_KEYS.filter((k) => builds.some((b) => b.data.layer === k));
+---
+<Base title="Builds" description="Things I'm building to understand how they work, with honest statuses." active="builds" footer="BUILDS">
+  <section class="wrap" style="padding-top:36px;padding-bottom:24px">
+    <div class="prompt">atheeq@board:~$ ls -l ~/builds</div>
+    <h1 class="display display-l" style="margin-top:14px">On the bench</h1>
+    <p class="lead" style="font-size:19px;max-width:58ch">Things I'm building to understand how they work, plus what I've shipped for real. Every build has a status, and I keep it honest: half-finished is allowed here.</p>
+    <ul class="row label" style="list-style:none;margin:22px 0 0;padding:0;gap:8px 20px">
+      <li style="color:var(--green)">● RUNNING</li><li style="color:var(--yellow)">◐ ON THE BENCH</li><li style="color:#7cc0ff">■ SHIPPED</li><li class="muted">○ QUEUED</li>
+    </ul>
+  </section>
+  {used.length > 1 && (
+    <div class="wrap row" role="group" aria-label="Layer" id="build-filter" style="gap:6px;padding-bottom:8px">
+      <button type="button" class="pill" data-layer="" aria-pressed="true" style="--c:#fff">ALL</button>
+      {used.map((k) => <button type="button" class="pill" data-layer={k} aria-pressed="false" style={`--c:${LAYERS[k].color}`}>{LAYERS[k].name}</button>)}
+    </div>
+  )}
+  <section class="wrap" aria-label="Builds" style="padding-top:32px;padding-bottom:72px">
+    {builds.length === 0 ? <div class="window"><Empty text="No builds published yet." /></div> : (
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(min(340px,100%),1fr));gap:44px 32px">
+        {builds.map((b) => <BuildCard b={b} big />)}
+      </div>
+    )}
+  </section>
+  <Subscribe slot="after" />
+</Base>
+<script>
+  const f = document.getElementById('build-filter');
+  f?.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-layer]');
+    if (!b) return;
+    f.querySelectorAll('[data-layer]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    document.querySelectorAll<HTMLElement>('.chip-card[data-layer]').forEach((c) => (c.hidden = !!b.dataset.layer && c.dataset.layer !== b.dataset.layer));
+  });
+</script>

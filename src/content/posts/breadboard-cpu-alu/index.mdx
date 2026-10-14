@@ -1,0 +1,51 @@
+---
+# EXAMPLE POST (draft). Shows the hardware "build log" style. Replace with your own, then set draft: false.
+title: "Breadboard CPU, part 3: wiring the ALU (and the LED I put in backwards)"
+summary: "Two chips, 120 jumper wires and one evening lost to a backwards LED. By the end, nibble-4 can add and subtract."
+num: 39
+date: 2026-10-09
+layer: hardware
+topics: [LOGIC, ELEC]
+draft: true
+series:
+  name: nibble-4
+  part: 3
+  project: nibble-4
+  parts: [Clock, Registers, ALU, RAM, Control unit, Run a program]
+---
+import Alu4 from './Toy';
+
+## What an ALU actually is
+
+The arithmetic logic unit is the part of a CPU that does the maths. In nibble-4 it's one 4-bit adder chip plus a trick: feed B through XOR gates and the same adder can subtract.
+
+<Photo label="YOUR BREADBOARD AFTER SESSION 3" caption="Figure 1. Adder on the left, XOR chip on the right, five output LEDs along the bottom." />
+
+<BenchLog items={[
+  { when: 'SAT 10:40', text: 'Placed the 74HC283 adder and 74HC86 XOR.' },
+  { when: 'SAT 13:15', text: 'Wired A and B buses from the registers.' },
+  { when: 'SAT 16:02', text: 'Bit 2 dead. One LED was in backwards.', tone: 'bad' },
+  { when: 'SAT 18:30', text: '5 − 3 = 2. Subtraction works.', tone: 'good' },
+]} />
+
+## Play with the ALU
+
+These are the same switches and LEDs as the real board. Flip the bits, then switch to SUB and watch the XOR gates flip B for you.
+
+<Toy title="4-BIT ALU">
+  <Alu4 client:visible />
+</Toy>
+
+## Bill of materials
+
+| Part | What it does | Qty |
+| --- | --- | ---: |
+| `74HC283` | 4-bit binary full adder | 1 |
+| `74HC86` | Quad XOR, flips B when subtracting | 1 |
+| 330 Ω resistor | Current limit for each LED | 5 |
+| LED, red | Shows result bits + carry (mind the flat side) | 5 |
+| Jumper wire | Everything else | ~120 |
+
+<Hat role="SDE HAT">
+This XOR trick is two's complement, the same reason `-1` is `0xFFFFFFFF` in your code. Every integer overflow bug you've met was born on a chip like this.
+</Hat>

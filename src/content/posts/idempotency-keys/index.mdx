@@ -1,0 +1,67 @@
+---
+# EXAMPLE POST (draft). Shows the software & AI "editor note" style. Replace with your own, then set draft: false.
+title: "Idempotency keys, or how not to charge a customer twice"
+summary: "Networks drop responses, users double-tap, and clients retry. One header turns all of that from a refund ticket into a non-event."
+num: 36
+date: 2026-10-03
+layer: software
+topics: [SYS, DEFENSE]
+draft: true
+file: idempotency.md
+---
+import ImpatientCustomer from './Toy';
+
+## The double charge
+
+A customer taps Pay. Your server charges the card, but the response dies somewhere in a lift with bad signal. The app sees a timeout and retries. Your server, having no memory of the first attempt, charges again.
+
+The fix is to make the request **idempotent**: doing it twice has the same effect as doing it once. The client sends a unique key with the request, and the server remembers what it did for each key.
+
+```sh title="terminal"
+curl -X POST /charge \
+    -H "Idempotency-Key: 8e1f-…-c2a7" \
+    -d '{"amount": 49900}'
+# {"id":"ch_19x","status":"succeeded"}
+```
+
+## Try it
+
+Be the impatient customer. Mash the button, then flip the key on and mash it again.
+
+<Toy title="THE IMPATIENT CUSTOMER">
+  <ImpatientCustomer client:visible />
+  <Fragment slot="caption">Same button, same network. The only difference is one header. Simulated, no real cards harmed.</Fragment>
+</Toy>
+
+## The server side
+
+Store the response under the key. If the key shows up again, replay the stored response instead of doing the work twice.
+
+```ts title="checkout.ts" {3-4}
+app.post('/charge', async (req, res) => {
+  const key = req.header('Idempotency-Key');
+  const seen = await redis.get(`idem:${key}`);
+  if (seen) return res.json(JSON.parse(seen)); // replay
+
+  const charge = await psp.charge(req.body);
+  await redis.set(`idem:${key}`, JSON.stringify(charge), 'EX', 86400);
+  res.json(charge);
+});
+```
+
+## The race you'll hit
+
+If two retries arrive at the same moment, both can miss on line 3 and both charge. Claim the key atomically first:
+
+```diff lang="ts" title="checkout.ts"
+-  const seen = await redis.get(`idem:${key}`);
++  const won = await redis.set(`lock:${key}`, '1', 'NX', 'EX', 30);
++  if (!won) return res.status(409).json({ retry: true });
++  const seen = await redis.get(`idem:${key}`);
+```
+
+## Why product cares
+
+<Hat role="PM HAT">
+A double charge isn't a bug report. It's a refund, a support ticket and a customer who now hesitates before tapping Pay. Fixing it is a reliability fix and a conversion fix at once.
+</Hat>

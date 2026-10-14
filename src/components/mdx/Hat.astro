@@ -1,0 +1,6 @@
+---
+/** A side note in a different voice. <Hat role="DEV HAT">…</Hat> or role="PM HAT" / "SDE HAT". */
+interface Props { role?: string }
+const { role = 'DEV HAT' } = Astro.props;
+---
+<aside class="hat"><span class="hat__tag" aria-hidden="true">{role}</span><div class="hat__body"><slot /></div></aside>

@@ -1,0 +1,57 @@
+---
+import FlagDrawer from './islands/FlagDrawer';
+import { SITE } from '../config/site';
+import { url, type FlagDef } from '../lib/content';
+
+interface Props {
+  active?: 'writing' | 'lab' | 'builds' | 'about' | null;
+  home?: boolean;
+  flags: FlagDef[];
+}
+const { active = null, home = false, flags } = Astro.props;
+const NAV = [
+  { key: 'writing', label: '~/WRITING', href: url('writing/') },
+  { key: 'lab', label: '~/LAB-NOTES', href: url('lab-notes/') },
+  { key: 'builds', label: '~/BUILDS', href: url('builds/') },
+  { key: 'about', label: '~/ABOUT', href: url('about/') },
+];
+---
+<header class="wrap site-header">
+  <a class="logo" href={url('')} title={home ? SITE.homeFlag : undefined}>
+    <span class="logo__pad" aria-hidden="true"></span>
+    <span class="logo__name">{SITE.os}</span>
+  </a>
+  <nav class="nav" aria-label="Primary">
+    {NAV.map((n) => (
+      <a href={n.href} class={n.key === 'lab' ? 'lab' : undefined} aria-current={active === n.key ? 'page' : undefined}>
+        {n.key === 'lab' && active !== 'lab' && <span class="hazard hazard-sq" aria-hidden="true"></span>}
+        {n.label}
+      </a>
+    ))}
+  </nav>
+  <div class="header-tools">
+    <FlagDrawer client:idle flags={flags} />
+    {home ? (
+      <div class="power">
+        <span class="label" id="power-label" style="color:rgba(255,255,255,0.85)">PWR ON</span>
+        <button type="button" class="power__btn" id="power" aria-pressed="true" aria-label="Power. Turning it on boots the site.">
+          <span class="power__knob" aria-hidden="true"></span>
+        </button>
+      </div>
+    ) : (
+      <button type="button" class="slash-hint" id="slash-hint">press <span class="kbd">/</span> for commands</button>
+    )}
+  </div>
+</header>
+
+<script>
+  const power = document.getElementById('power');
+  power?.addEventListener('click', () => {
+    const off = document.documentElement.classList.toggle('power-off');
+    power.setAttribute('aria-pressed', String(!off));
+    const l = document.getElementById('power-label');
+    if (l) l.textContent = off ? 'PWR OFF' : 'PWR ON';
+    window.dispatchEvent(new CustomEvent('power', { detail: !off }));
+  });
+  document.getElementById('slash-hint')?.addEventListener('click', () => window.dispatchEvent(new Event('palette:open')));
+</script>

@@ -1,0 +1,33 @@
+---
+import type { Row } from '../lib/content';
+interface Props { r: Row; extra?: boolean }
+const { r, extra = false } = Astro.props;
+---
+<li data-row hidden={extra} data-layer={r.layer} data-topics={r.topics.map((t) => t.code).join(' ')} data-title={r.title.toLowerCase()}>
+  <a class="gl" href={r.href}>
+    <span class="gl__lanes" aria-hidden="true">
+      <i></i><i></i><i></i><i></i>
+      <span class="gl__dot" style={`left:${r.laneX - 6}px;background:${r.laneColor};box-shadow:0 0 0 2px ${r.laneColor}`}></span>
+    </span>
+    <span class="gl__hash">{r.hash}</span>
+    <span class="gl__main">
+      <span class="gt">{r.title}</span>
+      <span class="gl__meta">
+        <span style={`color:${r.kindColor};font-weight:700`}>{r.kind}</span>
+        <span>{r.num}</span>
+        <span>{r.date}</span>
+        <span>{r.minutes} min read</span>
+        {r.flagId && (
+          <span class="flag-status" data-flag={r.flagId}>
+            <span class="led" aria-hidden="true" style="width:9px;height:9px"></span>
+            <span class="when-hidden">hides a flag</span><span class="when-found">flag found</span>
+          </span>
+        )}
+        {r.draft && <span class="draft-badge">DRAFT · NOT PUBLISHED</span>}
+      </span>
+    </span>
+    <span class="gl__tags">
+      {r.topics.map((t) => <span class="tag" style={`color:${t.color}`}>{t.code}</span>)}
+    </span>
+  </a>
+</li>

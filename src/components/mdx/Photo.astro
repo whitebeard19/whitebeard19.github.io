@@ -1,0 +1,6 @@
+---
+/** Placeholder until you have the real photo. Replace with ![alt](./photo.jpg) */
+interface Props { label: string; caption?: string }
+const { label, caption } = Astro.props;
+---
+<figure style="margin:24px 0"><div class="photo">[PHOTO: {label}]</div>{caption && <figcaption class="figcap">{caption}</figcaption>}</figure>

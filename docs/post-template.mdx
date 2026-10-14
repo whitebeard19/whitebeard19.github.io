@@ -1,0 +1,49 @@
+---
+# Copy this file to src/content/posts/<your-post-slug>/index.mdx
+# The folder name becomes the URL: /writing/<your-post-slug>/
+title: "Your title"
+summary: "One or two sentences that make someone want to read it."
+num: 42                      # next post number (#042)
+date: 2026-10-20
+layer: software              # hardware | software | security | product  (picks the post style)
+topics: [AI]                 # ELEC LOGIC | SYS AI | CRYPTO CTF DEFENSE | PROD  (first one must match the layer)
+draft: true                  # flip to false when it's ready to publish
+
+# security posts only (required):
+# scope: "Practice targets built to be attacked, in my isolated home lab."
+# source: "[practice CTF name]"
+# level: "beginner"
+# optional hidden flag (make the hash with: npm run flag -- "flag{...}"):
+# flagHash: <64 hex characters>
+# flagHint: "A nudge, not the answer."
+# flagLesson: "what finding it teaches."
+
+# hardware series (optional):
+# series: { name: nibble-4, part: 4, project: nibble-4, parts: [Clock, Registers, ALU, RAM, Control unit, Run a program] }
+
+# product teardown panel (optional):
+# case: { role: "engineer + product owner", team: "[2 eng]", timeline: "[3 weeks]" }
+---
+import MyToy from './Toy';
+
+## First section
+
+Write normally in Markdown. Every `##` heading shows up in the side outline.
+
+<Toy title="NAME OF THE TOY">
+  <MyToy client:visible />
+  <Fragment slot="caption">One line on what to try.</Fragment>
+</Toy>
+
+<Hat role="PM HAT">
+A side note in your other voice. Also: DEV HAT, SDE HAT.
+</Hat>
+
+<Spoiler label="SPOILER · click to reveal">
+Hidden until clicked.
+</Spoiler>
+
+```ts title="example.ts" {2}
+const answer = 42;
+console.log(answer); // highlighted line
+```

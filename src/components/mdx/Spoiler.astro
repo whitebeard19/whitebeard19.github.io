@@ -1,0 +1,6 @@
+---
+/** Click-to-reveal block. Works without JavaScript. */
+interface Props { label?: string }
+const { label = 'SPOILER · click to reveal' } = Astro.props;
+---
+<details class="spoiler"><summary>{label}</summary><div class="spoiler__body"><slot /></div></details>

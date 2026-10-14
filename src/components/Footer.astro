@@ -1,0 +1,14 @@
+---
+import { SITE } from '../config/site';
+import { url } from '../lib/content';
+interface Props { label?: string }
+const { label = `STILL COMPILING IN ${SITE.city}` } = Astro.props;
+---
+<footer class="wrap site-footer">
+  <span>{SITE.os} {SITE.version} · {label}</span>
+  <nav aria-label="Elsewhere">
+    {SITE.socials.map((s) => <a href={s.href} rel="me">{s.label}</a>)}
+    <a href={`mailto:${SITE.email}`}>EMAIL</a>
+    <a href={url('rss.xml')}>RSS</a>
+  </nav>
+</footer>

@@ -1,0 +1,7 @@
+---
+interface Props { text?: string }
+const { text = 'Nothing published here yet. The first commit is on its way.' } = Astro.props;
+---
+<div style="padding:32px 18px;font-family:var(--f-mono);font-size:15px;line-height:1.6;color:var(--text)">
+  <span style="color:var(--green)">$ git log</span><br />{text}
+</div>

@@ -1,0 +1,10 @@
+---
+/** Frame for a post's toy: <Toy title="HEX VIEWER" caption="…"><HexViewer client:visible … /></Toy> */
+interface Props { title: string; note?: string }
+const { title, note } = Astro.props;
+---
+<figure class="toy">
+  <div class="toy__head"><span class="label" style="font-size:13px">TOY · {title}</span>{note && <span class="mono" style="font-size:12px;color:#5b4a75">{note}</span>}</div>
+  <slot />
+  {Astro.slots.has('caption') && <figcaption class="toy__cap"><slot name="caption" /></figcaption>}
+</figure>

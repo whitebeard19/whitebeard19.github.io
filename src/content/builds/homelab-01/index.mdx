@@ -1,0 +1,58 @@
+---
+# EXAMPLE BUILD (draft). Replace with your real project, then set draft: false.
+name: homelab-01
+summary: "An old laptop running deliberately vulnerable practice apps, on a network that can't reach anything real, so I can learn security without touching a system I don't own."
+status: running
+layer: security
+stack: "VIRTUALBOX · INTERNAL NETWORK"
+since: "[AUG 2026]"
+progress: { done: 3, of: 4, label: "running, still adding targets" }
+order: 1
+draft: true
+links:
+  - { label: "SETUP NOTES ON GITHUB", href: "https://github.com/[YOUR-USERNAME]/homelab-01" }
+spec:
+  machine: "[old laptop, 8 GB RAM]"
+  hypervisor: "VirtualBox"
+  network: "internal only"
+  targets: "practice VMs"
+  cost: "₹0, reused"
+changelog:
+  - { when: "[AUG 2026]", text: "First boot. Wiped the laptop, installed VirtualBox." }
+  - { when: "[AUG 2026]", text: "Realised the default network let VMs reach my home Wi-Fi. Fixed it the same day.", tone: bad }
+  - { when: "[SEP 2026]", text: "Snapshot before every exercise. A broken VM is now a 10-second reset." }
+  - { when: "OCT 2026", text: "Used it to prepare for my first practice CTF.", tone: good }
+related: [my-first-ctf]
+---
+import ReachToy from './Toy';
+
+## Why it exists
+
+Learning security means learning how things break. The only honest way to practise that is on machines built to be broken, that you own, on a network that can't leak. homelab-01 is that place. Nothing in it is real, and nothing real can reach it.
+
+## The setting that matters most
+
+Each virtual machine's network adapter has a mode, and that one dropdown decides what a practice VM can talk to. Switch modes and watch what the practice VM can reach:
+
+<Toy title="WHO CAN REACH WHOM">
+  <ReachToy client:visible />
+</Toy>
+
+## What's in it
+
+| Part | Why it's there |
+| --- | --- |
+| [Old laptop] | Runs nothing else. If it breaks, nothing I care about breaks with it. |
+| VirtualBox | Snapshots: every exercise starts from a clean copy. |
+| Internal network | The VMs can see each other and nothing else. See the toy above. |
+| Practice targets | [Intentionally vulnerable apps published for learning, named in each lab note.] |
+| A paper notebook | Every step written down while it happens. That's where the posts come from. |
+
+<Hat role="DEV HAT">
+Building this taught me more about networking than any tutorial: what a subnet really is, why "default settings" deserve suspicion, and why staging environments at work are walled off the way they are.
+</Hat>
+
+## Next on this build
+
+1. Add a second target that practises the defender's side: reading logs and spotting what happened.
+2. Write the whole setup up as a lab note, so anyone can build the same safe space.

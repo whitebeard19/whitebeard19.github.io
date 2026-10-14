@@ -1,0 +1,11 @@
+---
+/** Timeline: <BenchLog items={[{ when: 'SAT 10:40', text: '…', tone: 'bad' }]} /> */
+interface Props { items: { when: string; text: string; tone?: 'bad' | 'good' }[]; title?: string; color?: string }
+const { items, title = 'BENCH LOG', color } = Astro.props;
+---
+<div style="margin:24px 0">
+  <div class="outline-h">{title}</div>
+  <ol class="bench-log" style={color ? `--rail:${color}` : undefined}>
+    {items.map((it) => <li class={it.tone}><span class="when">{it.when}</span>{it.text}</li>)}
+  </ol>
+</div>

@@ -1,0 +1,33 @@
+---
+import { LAYERS } from '../config/taxonomy';
+import { buildUrl, type Build } from '../lib/content';
+interface Props { b: Build; big?: boolean }
+const { b, big = false } = Astro.props;
+const ST = {
+  running: { label: '● RUNNING', color: 'var(--green)' },
+  bench: { label: '◐ ON THE BENCH', color: 'var(--yellow)' },
+  shipped: { label: '■ SHIPPED AT WORK', color: '#7cc0ff' },
+  queued: { label: '○ QUEUED', color: 'var(--muted)' },
+} as const;
+const s = ST[b.data.status];
+const L = LAYERS[b.data.layer];
+const pins = Array.from({ length: big ? 6 : 5 });
+---
+<a class="chip-card" href={buildUrl(b)} data-row data-layer={b.data.layer}>
+  <span class="chip-card__pins" aria-hidden="true">{pins.map(() => <i></i>)}</span>
+  <span class="chip-card__body" style={big ? 'padding:28px 24px 24px;min-height:300px' : undefined}>
+    <span class="chip-card__top"><span style={`color:${s.color}`}>{s.label}</span><span style="color:#a99fbb">{L.name}</span></span>
+    <span class="chip-card__name" style={big ? 'font-size:36px' : undefined}>{b.data.name}</span>
+    <span class="chip-card__desc" style={big ? 'font-size:17px;line-height:1.5' : undefined}>{b.data.summary}</span>
+    {big && (
+      <span style="display:block;margin-top:16px">
+        <span class="label" style="display:flex;justify-content:space-between;font-size:10px;color:#a99fbb"><span>PROGRESS</span><span>{b.data.progress.label}</span></span>
+        <span class="segs" aria-hidden="true">
+          {Array.from({ length: b.data.progress.of }, (_, i) => <i style={i < b.data.progress.done ? `background:${L.color}` : undefined}></i>)}
+        </span>
+      </span>
+    )}
+    <span class="chip-card__stack"><span>{b.data.stack}</span>{b.data.draft && <span class="draft-badge">DRAFT</span>}</span>
+  </span>
+  <span class="chip-card__pins" aria-hidden="true">{pins.map(() => <i></i>)}</span>
+</a>

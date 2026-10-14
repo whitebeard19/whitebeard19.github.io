@@ -1,0 +1,86 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Subscribe from '../../components/Subscribe.astro';
+import { mdxComponents } from '../../components/mdx';
+import { LAYERS } from '../../config/taxonomy';
+import { getBuilds, getPosts, postUrl, numLabel, url, type Build } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const builds = (await getBuilds()).filter((b) => b.data.page);
+  return builds.map((b) => ({ params: { slug: b.id }, props: { b } }));
+}
+const { b } = Astro.props as { b: Build };
+const d = b.data;
+const L = LAYERS[d.layer];
+const sec = d.layer === 'security';
+const { Content, headings } = await render(b);
+const posts = await getPosts();
+const related = d.related.map((id) => posts.find((p) => p.id === id)).filter(Boolean);
+const ST = { running: ['● RUNNING', 'var(--green)'], bench: ['◐ ON THE BENCH', 'var(--yellow)'], shipped: ['■ SHIPPED', '#7cc0ff'], queued: ['○ QUEUED', 'var(--muted)'] } as const;
+const [stLabel, stColor] = ST[d.status];
+---
+<Base title={d.name} description={d.summary} active="builds" footer={`BUILDS / ${d.name.toUpperCase()}`}>
+  <section class="wrap split" style="padding-top:32px;padding-bottom:32px;align-items:flex-end">
+    <div class="main">
+      <div class="row mono" style="font-size:13px">
+        <a href={url('builds/')} class="muted">~/builds</a><span style="color:var(--muted-2)">/</span>
+        {sec ? <span class="kind-chip sec">BUILD · {L.name}</span> : <span class="kind-chip" style={`background:${L.soft}`}>BUILD · {L.name}</span>}
+        <span class="label" style={`padding:3px 8px;border-radius:12px;border:1.5px solid ${stColor};color:${stColor};font-size:11px`}>{stLabel}{d.since ? ` SINCE ${d.since}` : ''}</span>
+        {d.draft && <span class="draft-badge">DRAFT · NOT PUBLISHED</span>}
+      </div>
+      <h1 class="display display-l" style="margin-top:18px">{d.name}</h1>
+      <p class="lead">{d.summary}</p>
+      {(d.links.length > 0 || related.length > 0) && (
+        <div class="row" style="margin-top:24px;gap:12px">
+          {d.links.map((l, i) => <a class={i === 0 ? 'key key--lime' : 'key key--ghost'} style={i === 0 ? `background:${L.color}` : undefined} href={l.href}>{l.label}</a>)}
+          {related.length > 0 && <a class="key key--ghost" href={postUrl(related[0]!)}>READ THE POSTS</a>}
+        </div>
+      )}
+    </div>
+    {d.spec && (
+      <div class="side panel-file">
+        <div class="panel-file__name"><span>spec.json</span></div>
+        <pre>{'{'}{Object.entries(d.spec).map(([k, v], i, a) => <>{'\n  '}<span class="json-k">"{k}"</span>: <span class="json-v">"{v}"</span>{i < a.length - 1 ? ',' : ''}</>)}{'\n}'}</pre>
+      </div>
+    )}
+  </section>
+
+  <div class="wrap-tight" style="padding-bottom:72px">
+    <div class="sheet">
+      <div class="window__bar">
+        <span class="dots" aria-hidden="true"><span></span><span></span><span style={sec ? 'background:var(--lime)' : undefined}></span></span>
+        <span>{b.id}/README.md</span>
+        <span class="pid">BRANCH: {L.name}</span>
+      </div>
+      <div class="sheet__body">
+        {(d.changelog.length > 0 || headings.length > 1) && (
+          <aside class="sheet__side" aria-label="Changelog">
+            {d.changelog.length > 0 && (
+              <>
+                <div class="outline-h">CHANGELOG</div>
+                <ol class="bench-log" style={`--rail:${L.color}`}>
+                  {d.changelog.map((c) => <li class={c.tone === 'normal' ? undefined : c.tone}><span class="when">{c.when}</span>{c.text}</li>)}
+                </ol>
+              </>
+            )}
+          </aside>
+        )}
+        <article class="prose">
+          <Content components={mdxComponents} />
+          {related.length > 0 && (
+            <nav class="more-grid" aria-label="Posts from this build">
+              {related.map((p, i) => (
+                <a class="more-card" href={postUrl(p!)} style={i % 2 ? `--bgc:${L.color};--fgc:var(--deep);background:${L.color};color:var(--deep)` : '--bgc:var(--panel);--fgc:#fff;background:var(--panel);color:#fff'}>
+                  <span class="k" style={i % 2 ? undefined : `color:${L.color}`}>{LAYERS[p!.data.layer].kind.toLowerCase()} · {numLabel(p!.data.num)}</span>
+                  <span class="t">{p!.data.title}</span>
+                </a>
+              ))}
+            </nav>
+          )}
+        </article>
+      </div>
+    </div>
+  </div>
+  <Subscribe slot="after" />
+</Base>

@@ -1,0 +1,132 @@
+---
+import Base from '../../layouts/Base.astro';
+import Window from '../../components/Window.astro';
+import GitRow from '../../components/GitRow.astro';
+import Subscribe from '../../components/Subscribe.astro';
+import Empty from '../../components/Empty.astro';
+import { LAYERS, LAYER_KEYS, TOPICS, TOPIC_KEYS } from '../../config/taxonomy';
+import { getPosts, rowOf, url, type Row } from '../../lib/content';
+
+const rows = (await getPosts()).map(rowOf);
+const months: { name: string; rows: Row[] }[] = [];
+for (const r of rows) {
+  const m = months.at(-1);
+  if (m && m.name === r.month) m.rows.push(r);
+  else months.push({ name: r.month, rows: [r] });
+}
+const feeds = [
+  { name: 'EVERYTHING', path: 'rss.xml', col: 'var(--yellow)' },
+  ...LAYER_KEYS.map((k) => ({ name: LAYERS[k].name, path: `rss/${k}.xml`, col: LAYERS[k].color })),
+];
+---
+<Base title="All writing" description="Every post, newest first: hardware, software & AI, security lab notes and product teardowns." active="writing" footer="WRITING">
+  <section class="wrap" style="padding-top:36px;padding-bottom:24px">
+    <div class="prompt">atheeq@board:~$ git log --all --graph</div>
+    <h1 class="display display-l" style="margin-top:14px">All writing</h1>
+    <p class="lead" style="font-size:19px;max-width:60ch">Everything I've written while learning, newest first. Four lanes, one per layer of the computer. Filter by layer or topic, or grep a title.</p>
+  </section>
+
+  <section class="wrap" aria-label="Filters" style="padding-bottom:24px">
+    <div class="window" id="filters" style="box-shadow:none;padding:16px 18px;display:flex;flex-direction:column;gap:14px">
+      <div class="row">
+        <span class="label muted" style="width:70px;font-size:11px">LAYER</span>
+        <button type="button" class="pill" data-layer="" aria-pressed="true" style="--c:#fff">ALL <span class="count">{rows.length}</span></button>
+        {LAYER_KEYS.map((k) => (
+          <button type="button" class="pill" data-layer={k} aria-pressed="false" style={`--c:${LAYERS[k].color}`}>
+            {k === 'security' && <span class="hazard" aria-hidden="true" style="width:12px;height:12px;border-radius:2px;border:1px solid var(--deep)"></span>}
+            {LAYERS[k].name} <span class="count">{rows.filter((r) => r.layer === k).length}</span>
+          </button>
+        ))}
+      </div>
+      <div class="row">
+        <span class="label muted" style="width:70px;font-size:11px">TOPIC</span>
+        {TOPIC_KEYS.map((t) => (
+          <button type="button" class="tag" data-topic={t} data-of={TOPICS[t].layer} aria-pressed="false" style={`color:${TOPICS[t].color}`}><span>{t}</span></button>
+        ))}
+      </div>
+      <div class="row">
+        <label for="grep" class="label muted" style="width:70px;font-size:11px">GREP -I</label>
+        <input id="grep" type="search" class="field" autocomplete="off" spellcheck="false" placeholder="a word from the title, like cpu or hash" style="flex:1 1 260px" />
+        <span class="mono" aria-live="polite" id="count" style="font-size:14px;padding:0 6px">{rows.length} posts</span>
+        <button type="button" class="key key--ghost key--sm" id="clear" hidden>GIT CHECKOUT ALL</button>
+      </div>
+    </div>
+  </section>
+
+  <section class="wrap" aria-label="Posts" style="padding-bottom:56px">
+    <Window title="~/writing — git log --all" pid={`${rows.length} COMMITS`} class="gitlog">
+      {months.map((m) => (
+        <div data-month>
+          <h2 class="month-h">{m.name.toUpperCase()}<span class="n">{m.rows.length} {m.rows.length === 1 ? 'commit' : 'commits'}</span></h2>
+          <ol style="padding-top:0">{m.rows.map((r) => <GitRow r={r} />)}</ol>
+        </div>
+      ))}
+      {rows.length === 0 && <Empty />}
+      <div id="nomatch" hidden style="padding:32px 18px;font-family:var(--f-mono);font-size:15px;line-height:1.6">fatal: no commits match.<br /><span class="muted">Try a shorter word, or git checkout all.</span></div>
+      <div class="gl__end">(END) — that's everything so far.</div>
+    </Window>
+  </section>
+
+  <section class="wrap" aria-labelledby="feeds-h" style="padding-bottom:64px">
+    <h2 id="feeds-h" class="h3" style="margin-bottom:8px">Follow one lane</h2>
+    <p style="margin:0 0 20px;font-size:18px;color:var(--text)">Only here for the security notes? Every layer has its own RSS feed.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:12px">
+      {feeds.map((f) => (
+        <a href={url(f.path)} style={`display:block;padding:14px 16px;border-radius:10px;border:2px solid ${f.col};border-left-width:8px;background:var(--panel);color:#fff;text-decoration:none`}>
+          <span class="label" style="display:block">{f.name}</span>
+          <span class="mono" style="display:block;margin-top:6px;font-size:14px">/{f.path}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <Subscribe slot="after" />
+</Base>
+
+<script>
+  const root = document.getElementById('filters')!;
+  const rows = Array.from(document.querySelectorAll<HTMLElement>('[data-row]'));
+  const months = Array.from(document.querySelectorAll<HTMLElement>('[data-month]'));
+  const grep = document.getElementById('grep') as HTMLInputElement;
+  const count = document.getElementById('count')!;
+  const clear = document.getElementById('clear') as HTMLButtonElement;
+  const nomatch = document.getElementById('nomatch')!;
+  let layer = '';
+  let topic = '';
+  const params = new URLSearchParams(location.search);
+  layer = params.get('layer') || '';
+  topic = (params.get('topic') || '').toUpperCase();
+  const apply = () => {
+    const q = grep.value.trim().toLowerCase();
+    root.querySelectorAll<HTMLElement>('[data-layer]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.layer === layer)));
+    root.querySelectorAll<HTMLElement>('[data-topic]').forEach((b) => {
+      b.setAttribute('aria-pressed', String(b.dataset.topic === topic));
+      b.hidden = !!layer && b.dataset.of !== layer;
+    });
+    let shown = 0;
+    rows.forEach((r) => {
+      const ok = (!layer || r.dataset.layer === layer) && (!topic || (r.dataset.topics || '').split(' ').includes(topic)) && (!q || (r.dataset.title || '').includes(q));
+      r.hidden = !ok;
+      if (ok) shown++;
+    });
+    months.forEach((m) => (m.hidden = !m.querySelector('[data-row]:not([hidden])')));
+    const filtered = !!(layer || topic || q);
+    count.textContent = filtered ? `${shown} of ${rows.length} posts` : `${rows.length} posts`;
+    clear.hidden = !filtered;
+    nomatch.hidden = shown > 0 || rows.length === 0;
+    const u = new URL(location.href);
+    layer ? u.searchParams.set('layer', layer) : u.searchParams.delete('layer');
+    topic ? u.searchParams.set('topic', topic.toLowerCase()) : u.searchParams.delete('topic');
+    history.replaceState(null, '', u);
+  };
+  root.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    const l = t.closest<HTMLElement>('[data-layer]');
+    const tp = t.closest<HTMLElement>('[data-topic]');
+    if (l) { layer = l.dataset.layer || ''; topic = ''; apply(); }
+    if (tp) { topic = topic === tp.dataset.topic ? '' : tp.dataset.topic!; apply(); }
+  });
+  grep.addEventListener('input', apply);
+  clear.addEventListener('click', () => { layer = ''; topic = ''; grep.value = ''; apply(); });
+  apply();
+</script>

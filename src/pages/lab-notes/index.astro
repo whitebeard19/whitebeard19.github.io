@@ -1,0 +1,126 @@
+---
+import Base from '../../layouts/Base.astro';
+import Subscribe from '../../components/Subscribe.astro';
+import Empty from '../../components/Empty.astro';
+import { LAB } from '../../config/site';
+import { TOPICS, topicsOf } from '../../config/taxonomy';
+import { getPosts, postUrl, numLabel, dateShort, minutes, url } from '../../lib/content';
+
+const lab = (await getPosts()).filter((p) => p.data.layer === 'security');
+const withFlags = lab.filter((p) => p.data.flagHash);
+const start = LAB.startHere
+  .map((s) => ({ ...s, post: lab.find((p) => p.id === s.slug) }))
+  .filter((s) => s.post);
+const topics = topicsOf('security');
+---
+<Base title="Lab notes" description="Security, learned the safe way: practice targets, an isolated home lab, and the defence each lesson taught me." active="lab" footer="LAB NOTES">
+  <section class="wrap split" style="padding-top:32px;padding-bottom:24px;align-items:flex-end">
+    <div class="main">
+      <span class="kind-chip sec">LAB NOTES · SECURITY LANE</span>
+      <h1 class="display display-xl" style="margin-top:16px">Lab notes</h1>
+      <p class="lead">Security, learned the safe way. Practice targets built to be broken, an isolated lab I set up myself, and the defence each lesson taught me. I'm a beginner, so these are written for beginners.</p>
+    </div>
+    <div class="side panel-file">
+      <div class="panel-file__name"><span>rules.txt</span><span>read-only</span></div>
+      <pre><span style="color:var(--muted-2)"># the lines I don't cross</span>{LAB.rules.map((r, i) => <>{'\n'}<span style="color:var(--lime)">{i + 1}.</span> {r}</>)}</pre>
+    </div>
+  </section>
+
+  {withFlags.length > 0 && (
+    <section class="wrap" aria-label="Flags in lab notes" style="padding-bottom:28px">
+      <div class="banner" style="justify-content:space-between">
+        <div class="row" style="gap:12px 16px;flex-wrap:nowrap">
+          <span class="hazard" aria-hidden="true" style="width:28px;height:28px;border-radius:4px;flex:none"></span>
+          <span style="font-size:16px"><strong><span id="lab-found">0</span> of {withFlags.length} lab-note flags found</strong> in this browser. Each one is hidden inside its post, and it always teaches the post's idea.</span>
+        </div>
+        <button type="button" class="key key--lime-ghost key--sm" id="open-drawer">OPEN FLAG DRAWER</button>
+      </div>
+    </section>
+  )}
+
+  {start.length > 0 && (
+    <section class="wrap" aria-labelledby="start-h" style="padding-top:16px;padding-bottom:40px">
+      <h2 id="start-h" class="h3" style="margin-bottom:6px">New to security? Start here.</h2>
+      <p style="margin:0 0 18px;font-size:18px;color:var(--text)">The order I wish I'd read things in.</p>
+      <ol style="list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px">
+        {start.map((s, i) => (
+          <li>
+            <a href={postUrl(s.post!)} class="start-card">
+              <span class="label" style="display:flex;justify-content:space-between"><span>STEP {i + 1}</span><span>{numLabel(s.post!.data.num)}</span></span>
+              <span style="font-family:var(--f-display);font-weight:700;font-size:21px;line-height:1.2">{s.post!.data.title}</span>
+              <span style="font-size:15px;line-height:1.45;opacity:.85">{s.why}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )}
+
+  <section class="wrap" aria-labelledby="all-h" style="padding-top:8px;padding-bottom:64px">
+    <div class="row" style="justify-content:space-between;align-items:flex-end;gap:12px 24px;margin-bottom:16px">
+      <h2 id="all-h" class="h3">Every lab note</h2>
+      <div class="row" role="group" aria-label="Topic" id="lab-filter" style="gap:6px">
+        <button type="button" class="pill" data-topic="" aria-pressed="true" style="--c:var(--lime)">ALL <span class="count">{lab.length}</span></button>
+        {topics.map((t) => <button type="button" class="pill" data-topic={t} aria-pressed="false" style="--c:var(--lime)">{t} <span class="count">{lab.filter((p) => p.data.topics.includes(t)).length}</span></button>)}
+      </div>
+    </div>
+    <div class="window">
+      <div class="hazard" aria-hidden="true" style="height:8px"></div>
+      {lab.length === 0 ? <Empty text="No lab notes published yet." /> : (
+        <ol style="list-style:none;margin:0;padding:0">
+          {lab.map((p) => (
+            <li data-row data-topics={p.data.topics.join(' ')} style="border-bottom:1px solid var(--line)">
+              <a class="lab-row" href={postUrl(p)}>
+                <span class="mono" style="flex:none;width:64px;font-weight:700;font-size:20px;color:var(--lime)">{numLabel(p.data.num)}</span>
+                <span style="flex:1 1 300px;min-width:0">
+                  <span class="gt">{p.data.title}</span>
+                  <span class="row mono" style="gap:6px 14px;margin-top:6px;font-size:13px;color:var(--muted)">
+                    <span>{dateShort(p.data.date)} · {minutes(p)} min</span>
+                    {p.data.source && <span style="color:var(--yellow)">source: {p.data.source}</span>}
+                    {p.data.topics.map((t) => <span class="tag" style={`color:${TOPICS[t].color}`}>{t}</span>)}
+                    {p.data.draft && <span class="draft-badge">DRAFT</span>}
+                  </span>
+                  <span class="row" style="gap:8px;margin-top:8px;font-size:15px;color:#eaffc9;flex-wrap:nowrap"><span class="hazard" aria-hidden="true" style="width:12px;height:12px;border-radius:2px;flex:none"></span>scope: {p.data.scope}</span>
+                </span>
+                {p.data.flagHash
+                  ? <span class="flag-chip" data-flag={p.id}><span class="led" aria-hidden="true"></span><span class="when-hidden">hides a flag</span><span class="when-found">flag found</span></span>
+                  : <span class="flag-chip flag-chip--none">no flag</span>}
+              </a>
+            </li>
+          ))}
+        </ol>
+      )}
+    </div>
+  </section>
+
+  <Subscribe slot="after" />
+</Base>
+
+<style>
+  .start-card { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 16px 18px; border-radius: 12px; border: 2px solid var(--lime); background: var(--panel); color: #fff; text-decoration: none; transition: background 160ms, color 160ms; }
+  .start-card:hover { background: var(--lime); color: var(--deep); }
+  .lab-row { display: flex; flex-wrap: wrap; gap: 10px 20px; align-items: center; padding: 18px; text-decoration: none; color: #fff; }
+  .lab-row:hover { background: var(--panel-2); color: #fff; }
+  .lab-row:hover .gt { text-decoration: underline; text-decoration-thickness: 2px; }
+  .flag-chip { margin-left: auto; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; padding: 6px 10px; border-radius: 16px; font-family: var(--f-label); font-size: 11px; color: var(--text); border: 1px solid #6b5a85; }
+  .flag-chip[data-found='true'] { background: rgba(184, 255, 59, 0.15); color: var(--lime); border-color: var(--lime); }
+  .flag-chip--none { color: var(--muted-2); border-style: dashed; border-color: #5a3a8a; }
+</style>
+
+<script>
+  import { getFound, onFlags } from '../../lib/flags';
+  const ids = Array.from(document.querySelectorAll<HTMLElement>('.flag-chip[data-flag]')).map((e) => e.dataset.flag!);
+  const out = document.getElementById('lab-found');
+  const paint = (f: string[]) => { if (out) out.textContent = String(ids.filter((i) => f.includes(i)).length); };
+  paint(getFound());
+  onFlags(paint);
+  document.getElementById('open-drawer')?.addEventListener('click', (e) => { e.stopPropagation(); window.dispatchEvent(new Event('drawer:open')); });
+  const f = document.getElementById('lab-filter');
+  f?.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-topic]');
+    if (!b) return;
+    const t = b.dataset.topic;
+    f.querySelectorAll('[data-topic]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+    document.querySelectorAll<HTMLElement>('[data-row]').forEach((r) => (r.hidden = !!t && !(r.dataset.topics || '').split(' ').includes(t)));
+  });
+</script>

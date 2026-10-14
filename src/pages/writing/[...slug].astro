@@ -1,0 +1,179 @@
+---
+import { render } from 'astro:content';
+import Base from '../../layouts/Base.astro';
+import Subscribe from '../../components/Subscribe.astro';
+import FlagBox from '../../components/islands/FlagBox';
+import { mdxComponents } from '../../components/mdx';
+import { LAYERS, TOPICS } from '../../config/taxonomy';
+import { getPosts, numLabel, dateLong, minutes, commitHash, neighbours, postUrl, url, type Post } from '../../lib/content';
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({ params: { slug: post.id }, props: { post, posts } }));
+}
+const { post, posts } = Astro.props as { post: Post; posts: Post[] };
+const d = post.data;
+const L = LAYERS[d.layer];
+const { Content, headings } = await render(post);
+const h2s = headings.filter((h) => h.depth === 2);
+const { newer, older } = neighbours(posts, post);
+const file = d.file ?? `${post.id}.md`;
+const num = numLabel(d.num);
+const sec = d.layer === 'security';
+const hw = d.layer === 'hardware';
+const sw = d.layer === 'software';
+const pr = d.layer === 'product';
+const railItems = [...h2s.map((h) => ({ text: h.text, href: '#' + h.slug })), ...(d.flagHash ? [{ text: 'Flag', href: '#flag' }] : [])].slice(0, 6);
+const sidePanel = sec
+  ? { name: 'scope.json', rows: Object.entries({ source: d.source, scope: d.scope, level: d.level }).filter(([, v]) => v) as [string, string][] }
+  : pr && d.case
+    ? { name: 'case.json', rows: Object.entries(d.case) }
+    : null;
+const moreColor = (p: Post) => LAYERS[p.data.layer].color;
+---
+<Base title={d.title} description={d.summary} active={sec ? 'lab' : 'writing'} footer={`${L.kind} ${num}`} ogType="article">
+  <section class="wrap split" style="padding-top:32px;padding-bottom:28px;align-items:flex-end">
+    <div class="main">
+      <div class="row mono" style="font-size:13px">
+        {sec
+          ? <span class="kind-chip sec">{L.kindLong}</span>
+          : <span class="kind-chip" style={`background:${L.soft}`}>{L.kindLong}</span>}
+        {d.topics.map((t) => <span class="tag" style={`color:${TOPICS[t].color}`}>{t}</span>)}
+        {sw && <span style="color:var(--orange)">{commitHash(d.num)}</span>}
+        <span class="muted">{num}{d.series ? ` · ${d.series.name}, part ${d.series.part} of ${d.series.parts.length}` : ''} · <time datetime={d.date.toISOString()}>{dateLong(d.date)}</time> · {minutes(post)} min read</span>
+        {d.flagHash && (
+          <span class="flag-status" data-flag={post.id} style="padding:3px 8px;border-radius:12px;border:1px solid #6b5a85;color:var(--text)">
+            <span class="led" aria-hidden="true"></span><span class="when-hidden">hides a flag</span><span class="when-found">flag found</span>
+          </span>
+        )}
+        {d.draft && <span class="draft-badge">DRAFT · NOT PUBLISHED</span>}
+      </div>
+      <h1 class="display display-post" style="margin-top:18px">{d.title}</h1>
+      <p class="lead">{d.summary}</p>
+    </div>
+
+    {sidePanel && (
+      <div class="side panel-file">
+        <div class="panel-file__name"><span>{sidePanel.name}</span></div>
+        <pre>{'{'}{sidePanel.rows.map(([k, v], i) => <>{'\n  '}<span class="json-k">"{k}"</span>: <span class="json-v" style={pr ? 'color:var(--yellow)' : undefined}>"{v}"</span>{i < sidePanel.rows.length - 1 ? ',' : ''}</>)}{'\n}'}</pre>
+      </div>
+    )}
+
+    {hw && d.series && (
+      <div class="side" style="background:#141016;border-radius:10px;padding:16px 18px">
+        <div class="label" style="display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#a99fbb;margin-bottom:10px">
+          <span>{d.series.name.toUpperCase()} · BUILD PROGRESS</span>
+          {d.series.project && <a href={url(`builds/${d.series.project}/`)} style="color:var(--yellow)">PROJECT →</a>}
+        </div>
+        <ol style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px;font-size:15px;color:var(--text)">
+          {d.series.parts.map((name, i) => {
+            const n = i + 1;
+            const st = n < d.series!.part ? 'done' : n === d.series!.part ? 'now' : 'todo';
+            return (
+              <li style={`display:flex;align-items:center;gap:10px;${st === 'now' ? 'color:#fff;font-weight:700' : st === 'todo' ? 'color:var(--muted-2)' : ''}`}>
+                <span aria-hidden="true" style={`width:12px;height:12px;border-radius:50%;flex:none;${st === 'done' ? 'background:var(--green)' : st === 'now' ? 'background:var(--yellow);box-shadow:0 0 10px 3px rgba(255,210,63,.6)' : 'border:2px solid var(--muted-2)'}`}></span>
+                {n} · {name}{st === 'now' ? ' (this post)' : ''}
+              </li>
+            );
+          })}
+        </ol>
+      </div>
+    )}
+  </section>
+
+  {sec && (
+    <div class="wrap" style="padding-bottom:20px">
+      <div class="banner">
+        <span class="hazard" aria-hidden="true" style="width:28px;height:28px;border-radius:4px;flex:none"></span>
+        <span style="flex:1 1 400px"><strong>Learning in a sandbox.</strong> Scope: {d.scope?.replace(/\.$/, '')}. These are notes on concepts and defences, not a how-to for touching systems you don't own. That line matters, legally and ethically, and I keep to it.</span>
+      </div>
+    </div>
+  )}
+
+  {(sec || pr) && railItems.length > 1 && (
+    <nav class="wrap rail" aria-label="Sections" style="padding-top:8px;padding-bottom:32px">
+      <span class={'rail__line' + (sec ? ' hazard' : '')} aria-hidden="true" style={pr ? `background:${L.color};height:4px;top:22px` : undefined}></span>
+      <ol style={`grid-template-columns:repeat(${railItems.length},minmax(0,1fr))`}>
+        {railItems.map((r, i) => (
+          <li><a href={r.href}>
+            <span class="rail__dot" aria-hidden="true" style={pr ? `--rail-dot:${L.color}` : undefined}></span>
+            {pr && <span class="mono" style="font-size:12px;color:var(--orange)">{commitHash(d.num * 10 + i)}</span>}
+            <span style="font-weight:700;font-size:15px">{r.text}</span>
+          </a></li>
+        ))}
+      </ol>
+    </nav>
+  )}
+
+  <div class="wrap-tight" style="padding-bottom:72px">
+    <div class={hw ? 'sheet sheet--cream' : 'sheet'}>
+      {sw ? (
+        <>
+          <div class="tabs">
+            <span class="dots" aria-hidden="true"><span></span><span></span><span></span></span>
+            <span class="tab">{file} <span aria-hidden="true" style="color:var(--muted-2)">×</span></span>
+          </div>
+          <div class="crumbs">writing › software › <span style="color:var(--ink)">{file}</span></div>
+        </>
+      ) : hw ? (
+        <div class="rails" aria-hidden="true"><i></i><span>+5V</span><i></i><span>GND</span></div>
+      ) : (
+        <div class="window__bar">
+          <span class="dots" aria-hidden="true"><span></span><span></span><span style={sec ? 'background:var(--lime)' : undefined}></span></span>
+          <span>{file}</span>
+          <span class="pid">BRANCH: {L.name}</span>
+        </div>
+      )}
+
+      <div class="sheet__body">
+        {h2s.length > 1 && (
+          <nav class="sheet__side" aria-label="On this page">
+            <div class="outline-h">{sw ? 'OUTLINE' : 'ON THIS PAGE'}</div>
+            <ol class="outline">
+              {h2s.map((h) => <li><a href={'#' + h.slug}># {h.text}</a></li>)}
+              {d.flagHash && <li><a href="#flag"># Flag</a></li>}
+            </ol>
+          </nav>
+        )}
+        <article class="prose">
+          <Content components={mdxComponents} />
+
+          {d.flagHash && (
+            <FlagBox client:visible id={post.id} num={num} hint={d.flagHint} lesson={d.flagLesson} />
+          )}
+
+          <nav class="more-grid" aria-label="More posts">
+            {older ? (
+              <a class="more-card" href={postUrl(older)} style="--bgc:var(--panel);--fgc:#fff;background:var(--panel);color:#fff">
+                <span class="k" style={`color:${moreColor(older)}`}>← older in {L.name.toLowerCase()} · {numLabel(older.data.num)}</span>
+                <span class="t">{older.data.title}</span>
+              </a>
+            ) : (
+              <a class="more-card" href={url('writing/')} style="--bgc:var(--panel);--fgc:#fff;background:var(--panel);color:#fff">
+                <span class="k" style="color:var(--orange)">← git log --all</span>
+                <span class="t">All writing</span>
+              </a>
+            )}
+            {newer ? (
+              <a class="more-card" href={postUrl(newer)} style={`--bgc:${L.color};--fgc:var(--deep);background:${L.color};color:var(--deep)`}>
+                <span class="k">newer in {L.name.toLowerCase()} · {numLabel(newer.data.num)} →</span>
+                <span class="t">{newer.data.title}</span>
+              </a>
+            ) : (
+              <a class="more-card" href={sec ? url('lab-notes/') : url('writing/')} style={`--bgc:${L.color};--fgc:var(--deep);background:${L.color};color:var(--deep)`}>
+                <span class="k">this is the newest · {sec ? 'all lab notes' : 'all writing'} →</span>
+                <span class="t">{sec ? 'Every lab note, with its scope and flag' : 'Everything else I’ve written'}</span>
+              </a>
+            )}
+          </nav>
+        </article>
+      </div>
+
+      {sw && (
+        <div class="statusbar"><span>main ✓ · markdown · UTF-8 · <a href={url('writing/')}>all writing</a></span><span>{minutes(post)} min read</span></div>
+      )}
+    </div>
+  </div>
+
+  <Subscribe slot="after" />
+</Base>
