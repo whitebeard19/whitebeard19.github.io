@@ -7,18 +7,18 @@
  */
 
 export const SITE = {
-  name: 'Atheeq Basith',
-  firstName: 'Atheeq',
+  name: 'Abdul Basith',
+  firstName: 'Basith',
   /** Shown in the logo, boot screen and footer. */
-  os: 'ATHEEQ.OS',
-  version: '5.0',
+  os: 'BASITH.OS',
+  version: '1.0',
   /** Used in the terminal prompt: atheeq@board:~$ */
-  handle: 'atheeq',
-  city: '[CITY]',
-  email: '[YOUR EMAIL]',
+  handle: 'basith',
+  city: 'Chennai',
+  email: 'abdulbasithatwork@gmail.com',
   /** One sentence for search engines and link previews. */
   description:
-    'Atheeq Basith, a fresher engineer learning computers in public: hardware, software and AI, beginner security, and product notes.',
+    'Abdul Basith, a fresher engineer learning computers in public: hardware, software and AI, security, and product notes.',
 
   hero: {
     tagline:
@@ -29,9 +29,9 @@ export const SITE = {
 
   /** Footer + about page links. Remove any you don't use. */
   socials: [
-    { label: 'GITHUB', href: 'https://github.com/[YOUR-USERNAME]' },
-    { label: 'LINKEDIN', href: 'https://www.linkedin.com/in/[YOUR-PROFILE]' },
-    { label: 'X', href: 'https://x.com/[YOUR-HANDLE]' },
+    { label: 'GITHUB', href: 'https://github.com/whitebeard19' },
+    { label: 'LINKEDIN', href: 'https://www.linkedin.com/in/abdulbasith2309' },
+    //{ label: 'X', href: 'https://x.com/[YOUR-HANDLE]' },
   ],
 
   /** Put your CV at public/cv.pdf, or set this to null to hide the button. */
@@ -63,18 +63,18 @@ export const NOW = {
 /** About page. */
 export const ABOUT = {
   neofetch: [
-    ['OS', 'atheeq.os 5.0 (fresher edition)'],
-    ['Host', '[STARTUP], [CITY]'],
+    ['OS', 'basith.os 1.0 (fresher edition)'],
+    ['Host', 'DemanualAI, Chennai'],
     ['Uptime', '~1 year in the industry'],
     ['Role', 'software engineer, learning out loud'],
-    ['Shell', '[Python, TypeScript]'],
-    ['Learning', 'digital logic · AI agents · security (beginner)'],
+    ['Shell', '[Python, TypeScript, JavaScript]'],
+    ['Learning', 'digital logic · AI agents · security'],
     ['Bench', 'breadboards, a multimeter, an isolated home lab'],
     ['Writes', 'explainers on whatever I’m learning'],
-    ['Open to', "[roles / internships you'd like to hear about]"],
+    //['Open to', "[roles / internships you'd like to hear about]"],
   ],
   recruiter: {
-    title: 'Software Engineer · [STARTUP] · [CITY]',
+    title: 'Software Engineer · DemanualAI · Chennai',
     bullets: [
       'About a year into my first engineering role at an early-stage startup, where I ship product features and pick up a bit of everything a small team needs.',
       '[One concrete thing you built or improved at work, in a line.]',
@@ -84,8 +84,8 @@ export const ABOUT = {
     ],
   },
   dayJob: {
-    title: 'Software Engineer · [STARTUP]',
-    when: '2025 → HEAD · [CITY]',
+    title: 'Software Engineer · DemanualAI',
+    when: '2025 → HEAD · Chennai',
     bullets: [
       '[A system or feature you work on, and who it helps.]',
       '[A real result: something faster, cheaper, or less broken.]',
@@ -97,7 +97,7 @@ export const ABOUT = {
     'Beginner security: CTFs and a sandboxed home lab, learning to defend by understanding attacks.',
     'Writing an AI agent from scratch, and blogging every lesson.',
   ],
-  education: { when: '20XX → 2025', title: '[DEGREE], [COLLEGE]', note: '[Final-year project worth naming.]' },
+  education: { when: '2021 → 2025', title: 'B.Tech IT, Jerusalem College of Engineering', note: 'Had a great college days...' },
   /** Learning roadmap: state is 'shipped' | 'learning' | 'queued'. */
   roadmap: {
     hardware: [
