@@ -35,7 +35,7 @@ export const SITE = {
   ],
 
   /** Put your CV at public/cv.pdf, or set this to null to hide the button. */
-  cv: 'cv.pdf' as string | null,
+  cv: null as string | null,
 
   /** Newsletter form. Buttondown: https://buttondown.com/api/emails/embed-subscribe/<your-username> */
   newsletterAction: 'https://buttondown.com/api/emails/embed-subscribe/[YOUR-BUTTONDOWN-USERNAME]',
