@@ -24,10 +24,11 @@ const hw = d.layer === 'hardware';
 const sw = d.layer === 'software';
 const pr = d.layer === 'product';
 const railItems = [...h2s.map((h) => ({ text: h.text, href: '#' + h.slug })), ...(d.flagHash ? [{ text: 'Flag', href: '#flag' }] : [])].slice(0, 6);
+const hackathon = pr && d.topics.includes('HACKATHON');
 const sidePanel = sec
   ? { name: 'scope.json', rows: Object.entries({ source: d.source, scope: d.scope, level: d.level }).filter(([, v]) => v) as [string, string][] }
   : pr && d.case
-    ? { name: 'case.json', rows: Object.entries(d.case) }
+    ? { name: hackathon ? 'hackathon.json' : 'case.json', rows: Object.entries(d.case) }
     : null;
 const moreColor = (p: Post) => LAYERS[p.data.layer].color;
 ---
@@ -59,7 +60,7 @@ const moreColor = (p: Post) => LAYERS[p.data.layer].color;
       </div>
     )}
 
-    {hw && d.series && (
+    {(hw || sw) && d.series && (
       <div class="side" style="background:#141016;border-radius:10px;padding:16px 18px">
         <div class="label" style="display:flex;justify-content:space-between;gap:8px;font-size:11px;color:#a99fbb;margin-bottom:10px">
           <span>{d.series.name.toUpperCase()} · BUILD PROGRESS</span>

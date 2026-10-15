@@ -6,7 +6,7 @@ summary: "One or two sentences that make someone want to read it."
 num: 42                      # next post number (#042)
 date: 2026-10-20
 layer: software              # hardware | software | security | product  (picks the post style)
-topics: [AI]                 # ELEC LOGIC | SYS AI | CRYPTO CTF DEFENSE | PROD  (first one must match the layer)
+topics: [AI]                 # ELEC LOGIC | SYS CLOUD AI | CRYPTO CTF DEFENSE | PROD HACKATHON  (first one must match the layer)
 draft: true                  # flip to false when it's ready to publish
 
 # security posts only (required):
@@ -18,11 +18,13 @@ draft: true                  # flip to false when it's ready to publish
 # flagHint: "A nudge, not the answer."
 # flagLesson: "what finding it teaches."
 
-# hardware series (optional):
+# series panel, hardware or software posts (optional):
 # series: { name: nibble-4, part: 4, project: nibble-4, parts: [Clock, Registers, ALU, RAM, Control unit, Run a program] }
 
 # product teardown panel (optional):
 # case: { role: "engineer + product owner", team: "[2 eng]", timeline: "[3 weeks]" }
+# hackathon teardown: add topic HACKATHON and the panel is labelled hackathon.json
+# case: { team: "[team size]", hours: "[hours]", result: "[result]", role: "[your role]" }
 ---
 import MyToy from './Toy';
 
