@@ -3,7 +3,7 @@ import { SITE } from '../config/site';
 interface Props { title?: string }
 const { title = 'Learn alongside me. One email when something new clicks.' } = Astro.props;
 ---
-<section class="subscribe" aria-labelledby="sub-h">
+{!SITE.newsletterAction.includes('[') && (<section class="subscribe" aria-labelledby="sub-h">
   <div class="wrap subscribe__in">
     <h2 id="sub-h" class="h3">{title}</h2>
     <form action={SITE.newsletterAction} method="post" target="_blank">
@@ -15,4 +15,4 @@ const { title = 'Learn alongside me. One email when something new clicks.' } = A
       <span style="font-size:14px">No spam. Unsubscribing is one click, and I won't take it personally.</span>
     </form>
   </div>
-</section>
+</section>)}
