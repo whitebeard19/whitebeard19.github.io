@@ -31,11 +31,10 @@ export const SITE = {
   socials: [
     { label: 'GITHUB', href: 'https://github.com/whitebeard19' },
     { label: 'LINKEDIN', href: 'https://www.linkedin.com/in/abdulbasith2309' },
-    //{ label: 'X', href: 'https://x.com/[YOUR-HANDLE]' },
   ],
 
   /** Put your CV at public/cv.pdf, or set this to null to hide the button. */
-  cv: null as string | null,
+  cv: 'cv.pdf' as string | null,
 
   /** Newsletter form. Buttondown: https://buttondown.com/api/emails/embed-subscribe/<your-username> */
   newsletterAction: 'https://buttondown.com/api/emails/embed-subscribe/[YOUR-BUTTONDOWN-USERNAME]',
@@ -71,7 +70,7 @@ export const ABOUT = {
     ['Learning', 'digital logic · AI agents · security'],
     ['Bench', 'breadboards, a multimeter, an isolated home lab'],
     ['Writes', 'explainers on whatever I’m learning'],
-    //['Open to', "[roles / internships you'd like to hear about]"],
+    ['Open to', 'open source contributions'],
   ],
   recruiter: {
     title: 'Software Engineer · DemanualAI · Chennai',
@@ -80,7 +79,7 @@ export const ABOUT = {
       '[One concrete thing you built or improved at work, in a line.]',
       'Teaching myself computer fundamentals from the ground up: digital logic on breadboards, AI agents from scratch, and security through beginner CTFs in an isolated home lab.',
       'Keep a public blog that explains what I learn, with a small interactive demo I build for each post.',
-      'Open to: [roles / internships] · Location: [city / remote].',
+      'Open to: open source contributions · Based in Chennai.',
     ],
   },
   dayJob: {
@@ -97,7 +96,7 @@ export const ABOUT = {
     'Beginner security: CTFs and a sandboxed home lab, learning to defend by understanding attacks.',
     'Writing an AI agent from scratch, and blogging every lesson.',
   ],
-  education: { when: '2021 → 2025', title: 'B.Tech IT, Jerusalem College of Engineering', note: 'Had a great college days...' },
+  education: { when: '2021 → 2025', title: 'B.Tech IT, Jerusalem College of Engineering', note: 'Where I learned the basics of software and computing.' },
   /** Learning roadmap: state is 'shipped' | 'learning' | 'queued'. */
   roadmap: {
     hardware: [
