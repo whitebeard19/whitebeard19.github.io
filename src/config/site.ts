@@ -24,7 +24,7 @@ export const SITE = {
     tagline:
       'A fresher taking computers apart, one layer at a time, and writing down everything I find inside.',
     intro:
-      "By day I build software at a startup, mostly event-driven systems. Outside work I'm learning how computers work from transistors up, plus AI engineering, system design and security. Every post here is the explainer I wish I'd found when I was stuck.",
+      "By day I build software at a startup. Outside work I'm learning how computers work from transistors up, plus AI engineering, system design and security. Every post here is the explainer I wish I'd found when I was stuck.",
   },
 
   /** Footer + about page links. Remove any you don't use. */
@@ -53,7 +53,7 @@ export const NOW = {
     { cpu: 48, cmd: 'learn: nand2tetris, from transistors to a whole computer', layer: 'hardware' },
     { cpu: 41, cmd: 'practise: pwn.college challenges', layer: 'security' },
     { cpu: 36, cmd: 'learn: AI engineering and system design for AI', layer: 'software' },
-    { cpu: 30, cmd: 'ship: event-driven architectures at DemanualAI', layer: 'software' },
+    { cpu: 30, cmd: 'ship: project work at DemanualAI', layer: 'software' },
     { cpu: 22, cmd: 'prepare: AWS Solutions Architect Associate', layer: 'software' },
     { cpu: 14, cmd: 'write: the next post', layer: 'product' },
   ],
@@ -75,7 +75,7 @@ export const ABOUT = {
     title: 'Software Engineer · DemanualAI · Chennai',
     bullets: [
       'About a year into my first engineering role at an early-stage startup, working across several projects and picking up a bit of everything a small team needs.',
-      'Built event-driven architectures, and reworked an existing codebase to make it more secure.',
+      'Built new systems and reworked an existing codebase to make it more secure.',
       'Teaching myself the fundamentals: nand2tetris from transistors up, AI engineering and system design, and security practice on pwn.college. Preparing for the AWS Solutions Architect Associate exam.',
       'Keep a public blog that explains what I learn, with a small interactive demo I build for each post.',
       'Open to: open source contributions · Based in Chennai.',
@@ -85,7 +85,7 @@ export const ABOUT = {
     title: 'Software Engineer · DemanualAI',
     when: '2025 → HEAD · Chennai',
     bullets: [
-      'Work across several projects at the startup, building event-driven architectures.',
+      'Work across several projects at the startup, building and improving software.',
       'Improved an existing codebase into a more secure one.',
       'Learning how production software is built, reviewed and kept alive.',
     ],
@@ -102,7 +102,7 @@ export const ABOUT = {
       { name: 'nand2tetris', state: 'learning', note: 'Going from transistors and logic gates up to a working computer.' },
     ],
     software: [
-      { name: 'Event-driven architectures', state: 'shipped', note: 'What I build at work.' },
+      { name: 'Shipping software at a startup', state: 'shipped', note: 'My day job: building and improving real projects.' },
       { name: 'System design', state: 'learning', note: 'Studying how larger systems fit together, including AWS (preparing for Solutions Architect Associate).' },
       { name: 'AI engineering & system design for AI', state: 'learning', note: 'Learning how to build and design systems around AI models.' },
       { name: 'C++ and Rust', state: 'queued', note: 'Planned next, for closer-to-the-metal programming.' },
