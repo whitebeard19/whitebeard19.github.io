@@ -25,7 +25,7 @@ Almost everything personal is in **one file: `src/config/site.ts`**. Replace eve
 | About page: neofetch, recruiter mode, job, education, roadmap | `ABOUT` |
 | Lab notes rules + "start here" list | `LAB` |
 
-Topics (ELEC, LOGIC, SYS, AI, CRYPTO, CTF, DEFENSE, PROD) and layer colours are in `src/config/taxonomy.ts`.
+Topics (ELEC, LOGIC, SYS, CLOUD, AI, CRYPTO, CTF, DEFENSE, PROD, HACKATHON) and layer colours are in `src/config/taxonomy.ts`.
 
 > Search the project for `[` to find any placeholder you missed.
 
@@ -42,15 +42,15 @@ The four posts in `src/content/posts/` and the builds in `src/content/builds/` a
    | layer | style | extras |
    |---|---|---|
    | `hardware` | build log (cream breadboard sheet) | `series` progress panel, `<BenchLog>`, `<Photo>` |
-   | `software` | editor note (tabs, outline, status bar) | code blocks with titles, line highlights, diffs |
+   | `software` | editor note (tabs, outline, status bar) | `series` progress panel, code blocks with titles, line highlights, diffs |
    | `security` | lab notes (sandbox banner, stage rail) | **`scope` is required**, optional hidden flag |
-   | `product` | teardown (commit rail) | `case` panel |
+   | `product` | teardown (commit rail) | `case` panel (`hackathon.json` when the post has the `HACKATHON` topic) |
 
 4. Add a toy: copy `docs/Toy-template.tsx` next to the post as `Toy.tsx`, import it at the top of the post, and place it with `<Toy title="…"><MyToy client:visible /></Toy>`.
    Reusable toys live in `src/components/kit/` (e.g. `HexViewer`). Home-page toys live in `src/components/toys/`.
 5. Set `draft: false` when it's ready.
 
-Components you can use in any post without importing: `<Toy>`, `<Hat role="PM HAT">`, `<Spoiler>`, `<Photo>`, `<BenchLog>`.
+Components you can use in any post without importing: `<Toy>`, `<Hat role="PM HAT">`, `<Spoiler>`, `<Photo>`, `<BenchLog>`. For system design posts, import `ArchDiagram` from `src/components/kit/ArchDiagram` inside a `<Toy>`.
 
 ### Hiding a flag in a post
 
