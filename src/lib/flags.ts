@@ -4,7 +4,7 @@
  */
 export type Flag = { id: string; num: string; title: string; href: string; hash: string };
 
-const KEY = 'atheeq.flags.v1';
+const KEY = 'basith.flags.v1';
 const EVENT = 'flags:change';
 
 export function getFound(): string[] {

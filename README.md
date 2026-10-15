@@ -1,4 +1,4 @@
-# ATHEEQ.OS
+# BASITH.OS
 
 My portfolio and learning-in-public blog. Built with Astro + MDX, with small Preact "toys" inside posts, and hosted free on GitHub Pages.
 
@@ -73,7 +73,7 @@ One folder per project in `src/content/builds/<slug>/index.mdx`. Set `page: fals
 3. In the repo: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
 4. Every push to `main` now builds and deploys in about two minutes (see the **Actions** tab).
 
-Custom domain later: put the domain in `public/CNAME` (one line, e.g. `atheeq.dev`), set it in Settings → Pages, and point your DNS at GitHub.
+Custom domain later: put the domain in `public/CNAME` (one line, e.g. `basith.dev`), set it in Settings → Pages, and point your DNS at GitHub.
 
 ## Useful commands
 

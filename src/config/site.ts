@@ -12,7 +12,7 @@ export const SITE = {
   /** Shown in the logo, boot screen and footer. */
   os: 'BASITH.OS',
   version: '1.0',
-  /** Used in the terminal prompt: atheeq@board:~$ */
+  /** Used in the terminal prompt: basith@board:~$ */
   handle: 'basith',
   city: 'Chennai',
   email: 'abdulbasithatwork@gmail.com',
